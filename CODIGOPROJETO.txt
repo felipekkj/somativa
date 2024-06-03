@@ -1,0 +1,341 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.HashMap;
+
+public class DesignerCamisetaPersonalizada extends JFrame {
+    private JTextField campoUsuarioLogin, campoSenhaLogin, campoUsuarioCadastro, campoSenhaCadastro;
+    private JButton botaoEntrar, botaoCadastrar, botaoVisualizar, botaoComprarNormal, botaoComprarPersonalizada, botaoPersonalizar, botaoPagar;
+    private JComboBox<String> corComboBox, tamanhoComboBox;
+    private JTextField campoTexto;
+    private JRadioButton superiorRadioButton, inferiorRadioButton;
+    private JPanel loginPanel, cadastroPanel, personalizacaoPanel, pagamentoPanel, telaPrincipalPanel, visualizarCamisetasNormaisPanel;
+    private CardLayout cardLayout;
+
+    private HashMap<String, String> usuariosCadastrados; // Mapeamento de usuário para senha
+
+    public DesignerCamisetaPersonalizada() {
+        setTitle("Designer de Camiseta Personalizada");
+        setSize(400, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        cardLayout = new CardLayout();
+        setLayout(cardLayout);
+
+        usuariosCadastrados = new HashMap<>();
+
+        loginPanel = criarLoginPanel();
+        cadastroPanel = criarCadastroPanel();
+        telaPrincipalPanel = criarTelaPrincipalPanel();
+        personalizacaoPanel = criarPersonalizacaoPanel();
+        pagamentoPanel = criarPagamentoPanel();
+        visualizarCamisetasNormaisPanel = criarVisualizarCamisetasNormaisPanel(); // Adicionando a nova tela
+
+        add(loginPanel, "login");
+        add(cadastroPanel, "cadastro");
+        add(telaPrincipalPanel, "telaPrincipal");
+        add(personalizacaoPanel, "personalizacao");
+        add(pagamentoPanel, "pagamento");
+        add(visualizarCamisetasNormaisPanel, "visualizarCamisetasNormais"); // Adicionando a nova tela
+
+        cardLayout.show(this.getContentPane(), "login");
+
+        setVisible(true);
+    }
+
+    private JPanel criarLoginPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(7, 1));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(Color.lightGray);
+
+        JLabel usuarioLabel = new JLabel("Usuário:");
+        usuarioLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        campoUsuarioLogin = new JTextField(15);
+        campoUsuarioLogin.setFont(new Font("Arial", Font.PLAIN, 14));
+        JLabel senhaLabel = new JLabel("Senha:");
+        senhaLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        campoSenhaLogin = new JPasswordField(15);
+        campoSenhaLogin.setFont(new Font("Arial", Font.PLAIN, 14));
+        botaoEntrar = new JButton("Entrar");
+        botaoEntrar.setFont(new Font("Arial", Font.BOLD, 14));
+        JLabel cadastroLabel = new JLabel("Ainda não tem uma conta?");
+        cadastroLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        JButton botaoCadastro = new JButton("Cadastrar");
+        botaoCadastro.setFont(new Font("Arial", Font.BOLD, 14));
+
+        panel.add(usuarioLabel);
+        panel.add(campoUsuarioLogin);
+        panel.add(senhaLabel);
+        panel.add(campoSenhaLogin);
+        panel.add(botaoEntrar);
+        panel.add(cadastroLabel);
+        panel.add(botaoCadastro);
+
+        botaoEntrar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Verifica se o usuário e senha estão corretos
+                String usuario = campoUsuarioLogin.getText();
+                String senha = campoSenhaLogin.getText();
+
+                if (usuariosCadastrados.containsKey(usuario) && usuariosCadastrados.get(usuario).equals(senha)) {
+                    JOptionPane.showMessageDialog(DesignerCamisetaPersonalizada.this, "Login realizado com sucesso!");
+                    cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "telaPrincipal");
+                } else {
+                    JOptionPane.showMessageDialog(DesignerCamisetaPersonalizada.this, "Usuário ou senha incorretos!");
+                }
+            }
+        });
+
+        botaoCadastro.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "cadastro");
+            }
+        });
+
+        return panel;
+    }
+
+    private JPanel criarCadastroPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(7, 1));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(Color.lightGray);
+
+        JLabel usuarioLabel = new JLabel("Usuário:");
+        usuarioLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        campoUsuarioCadastro = new JTextField(15);
+        campoUsuarioCadastro.setFont(new Font("Arial", Font.PLAIN, 14));
+        JLabel senhaLabel = new JLabel("Senha:");
+        senhaLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        campoSenhaCadastro = new JPasswordField(15);
+        campoSenhaCadastro.setFont(new Font("Arial", Font.PLAIN, 14));
+        botaoCadastrar = new JButton("Cadastrar");
+        botaoCadastrar.setFont(new Font("Arial", Font.BOLD, 14));
+        JButton botaoVoltar = new JButton("Voltar");
+        botaoVoltar.setFont(new Font("Arial", Font.BOLD, 14));
+
+        panel.add(usuarioLabel);
+        panel.add(campoUsuarioCadastro);
+        panel.add(senhaLabel);
+        panel.add(campoSenhaCadastro);
+        panel.add(botaoCadastrar);
+        panel.add(botaoVoltar);
+
+        botaoCadastrar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Obtém os dados de cadastro
+                String novoUsuario = campoUsuarioCadastro.getText();
+                String novaSenha = campoSenhaCadastro.getText();
+
+                // Verifica se o usuário já existe
+                if (usuariosCadastrados.containsKey(novoUsuario)) {
+                    JOptionPane.showMessageDialog(DesignerCamisetaPersonalizada.this, "Usuário já cadastrado!");
+                } else {
+                    // Realiza o cadastro
+                    usuariosCadastrados.put(novoUsuario, novaSenha);
+                    JOptionPane.showMessageDialog(DesignerCamisetaPersonalizada.this, "Cadastro realizado com sucesso!");
+                    // Após o cadastro, volta para a página de login
+                    cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "login");
+                }
+            }
+        });
+
+        botaoVoltar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "login");
+            }
+        });
+
+        return panel;
+    }
+
+    private JPanel criarTelaPrincipalPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(4, 1));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(Color.lightGray);
+
+        JLabel tituloLabel = new JLabel("Bem-vindo ao TeeLab, o melhor site de Camisetas Personalizadas!");
+        tituloLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        botaoComprarNormal = new JButton("Comprar Camiseta Normal");
+        botaoComprarNormal.setFont(new Font("Arial", Font.BOLD, 14));
+        botaoComprarPersonalizada = new JButton("Comprar Camiseta Personalizada");
+        botaoComprarPersonalizada.setFont(new Font("Arial", Font.BOLD, 14));
+        JButton botaoVoltar = new JButton("Sair");
+        botaoVoltar.setFont(new Font("Arial", Font.BOLD, 14));
+
+        panel.add(tituloLabel);
+        panel.add(botaoComprarNormal);
+        panel.add(botaoComprarPersonalizada);
+        panel.add(botaoVoltar);
+
+        botaoComprarNormal.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Mostrar a tela de visualização de camisetas normais
+                cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "visualizarCamisetasNormais");
+            }
+        });
+
+        botaoComprarPersonalizada.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "personalizacao");
+            }
+        });
+
+        botaoVoltar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        return panel;
+    }
+
+    private JPanel criarPersonalizacaoPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(15, 1));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(Color.lightGray);
+
+        JLabel tituloLabel = new JLabel("Personalize sua camiseta:");
+        tituloLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        JLabel corLabel = new JLabel("Escolha a Cor da Camiseta:");
+        corLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        corComboBox = new JComboBox<>(new String[]{"Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Preto", "Branco", "Rosa"});
+        corComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        JLabel textoLabel = new JLabel("Digite o Texto da Camiseta:");
+        textoLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        campoTexto = new JTextField(20);
+        campoTexto.setFont(new Font("Arial", Font.PLAIN, 14));
+        JLabel tamanhoLabel = new JLabel("Escolha o Tamanho da Camiseta:");
+        tamanhoLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        tamanhoComboBox = new JComboBox<>(new String[]{"P", "M", "G"});
+        tamanhoComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        JLabel posicaoLabel = new JLabel("Escolha a Posição do Texto:");
+        posicaoLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        JPanel posicaoPanel = new JPanel();
+        posicaoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        superiorRadioButton = new JRadioButton("Superior");
+        superiorRadioButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        inferiorRadioButton = new JRadioButton("Inferior");
+        inferiorRadioButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        ButtonGroup grupoPosicao = new ButtonGroup();
+        grupoPosicao.add(superiorRadioButton);
+        grupoPosicao.add(inferiorRadioButton);
+        posicaoPanel.add(superiorRadioButton);
+        posicaoPanel.add(inferiorRadioButton);
+        botaoPersonalizar = new JButton("Personalizar");
+        botaoPersonalizar.setFont(new Font("Arial", Font.BOLD, 14));
+        JButton botaoVoltar = new JButton("Voltar");
+        botaoVoltar.setFont(new Font("Arial", Font.BOLD, 14));
+
+        panel.add(tituloLabel);
+        panel.add(corLabel);
+        panel.add(corComboBox);
+        panel.add(textoLabel);
+        panel.add(campoTexto);
+        panel.add(tamanhoLabel);
+        panel.add(tamanhoComboBox);
+        panel.add(posicaoLabel);
+        panel.add(posicaoPanel);
+        panel.add(botaoPersonalizar);
+        panel.add(botaoVoltar);
+
+        botaoPersonalizar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "pagamento");
+            }
+        });
+
+        botaoVoltar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "telaPrincipal");
+            }
+        });
+
+        return panel;
+    }
+
+    private JPanel criarPagamentoPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(15, 1));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(Color.lightGray);
+
+        JLabel tituloLabel = new JLabel("Por favor, insira os dados do seu cartão de crédito:");
+        tituloLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        JLabel numeroCartaoLabel = new JLabel("Número do Cartão:");
+        numeroCartaoLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        JTextField campoNumeroCartao = new JTextField(15);
+        campoNumeroCartao.setFont(new Font("Arial", Font.PLAIN, 14));
+        JLabel dataValidadeLabel = new JLabel("Data de Validade:");
+        dataValidadeLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        JTextField campoDataValidade = new JTextField(7);
+        campoDataValidade.setFont(new Font("Arial", Font.PLAIN, 14));
+        JLabel cvvLabel = new JLabel("CVV:");
+        cvvLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        JTextField campoCVV = new JTextField(3);
+        campoCVV.setFont(new Font("Arial", Font.PLAIN, 14));
+        JButton botaoPagar = new JButton("Pagar");
+        botaoPagar.setFont(new Font("Arial", Font.BOLD, 14));
+        JButton botaoVoltar = new JButton("Voltar");
+        botaoVoltar.setFont(new Font("Arial", Font.BOLD, 14));
+
+        panel.add(tituloLabel);
+        panel.add(numeroCartaoLabel);
+        panel.add(campoNumeroCartao);
+        panel.add(dataValidadeLabel);
+        panel.add(campoDataValidade);
+        panel.add(cvvLabel);
+        panel.add(campoCVV);
+        panel.add(botaoPagar);
+        panel.add(botaoVoltar);
+
+        botaoPagar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Código para processar o pagamento
+                JOptionPane.showMessageDialog(DesignerCamisetaPersonalizada.this, "Pagamento efetuado com sucesso! Sua camiseta já está sendo feita!");
+            }
+        });
+
+        botaoVoltar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "personalizacao");
+            }
+        });
+
+        return panel;
+    }
+
+    private JPanel criarVisualizarCamisetasNormaisPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(2, 1));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(Color.lightGray);
+
+        JLabel tituloLabel = new JLabel("Visualizar Camisetas Normais");
+        tituloLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        JButton botaoVoltar = new JButton("Voltar");
+        botaoVoltar.setFont(new Font("Arial", Font.BOLD, 14));
+
+        panel.add(tituloLabel);
+        panel.add(botaoVoltar);
+
+        botaoVoltar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(DesignerCamisetaPersonalizada.this.getContentPane(), "telaPrincipal");
+            }
+        });
+
+        return panel;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new DesignerCamisetaPersonalizada();
+            }
+        });
+    }
+}
